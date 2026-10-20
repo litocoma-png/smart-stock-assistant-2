@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#163b32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<title>Smart Stock & Price Assistant</title>
+<style>
+:root{--green:#163b32;--green2:#245c4c;--bg:#f4f6f5;--card:#fff;--text:#17211d;--muted:#66736d;--line:#dce4df;--red:#b42318;--amber:#9a6700}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:var(--green);color:white;padding:18px max(16px,env(safe-area-inset-left));position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:10px}header h1{font-size:19px;margin:0 0 3px}.brand-logo{width:44px;height:44px;object-fit:contain;flex:0 0 auto}#installApp{margin:0 0 0 auto;background:#fff;color:var(--green);white-space:nowrap}header p{margin:0;color:#d5e7df;font-size:12px}
+nav{display:flex;overflow:auto;gap:6px;padding:10px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:69px;z-index:4}
+nav button{white-space:nowrap;border:0;background:#edf2ef;color:var(--green);padding:9px 12px;border-radius:9px;font-weight:650}
+nav button.active{background:var(--green);color:white}.navicon{display:inline-flex;align-items:center;justify-content:center;min-width:18px;margin-right:4px;font-size:15px;font-weight:800}
+main{max-width:1100px;margin:auto;padding:16px; padding-bottom:48px}
+.panel{display:none}.panel.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:16px}
+.card,.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kicker{font-size:12px;color:var(--muted);font-weight:650}.metric{font-size:23px;font-weight:800;margin-top:4px;overflow-wrap:anywhere}
+h2{font-size:19px;margin:8px 0 12px}h3{font-size:15px;margin:0 0 10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:9px 0 5px}
+input,select,textarea{width:100%;border:1px solid #cbd6cf;border-radius:9px;padding:10px;font:inherit;background:white;color:var(--text);min-height:42px}
+button{cursor:pointer;font:inherit}
+.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:700;background:var(--green);color:white;margin:7px 5px 0 0}
+.btn.secondary{background:#e9efeb;color:var(--green)}.btn.danger{background:#fff0ef;color:var(--red);border:1px solid #f4c7c3}
+.btn.small{padding:6px 8px;font-size:12px}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+table{width:100%;border-collapse:collapse;font-size:13px;background:white}.productthumb{width:44px;height:44px;object-fit:cover;border-radius:7px;border:1px solid var(--line);background:#f5f5f5;display:block}.productnamecell{display:flex;gap:9px;align-items:center;min-width:180px}.fallbackthumb{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#edf2ef;color:var(--green);font-size:20px;border:1px solid var(--line);flex-shrink:0}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f0f4f1;color:#46544c}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:11px;margin-top:12px}
+.note{font-size:12px;color:var(--muted)}.warning{background:#fff7e5;border:1px solid #f2d28a;padding:10px;border-radius:9px;color:#674d00;font-size:13px}
+.good{color:#177245}.bad{color:var(--red)}.pill{display:inline-block;padding:3px 7px;border-radius:20px;background:#e8f5ed;color:#17633e;font-size:11px;font-weight:700}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+#scannerVideo{width:100%;max-height:280px;background:#111;border-radius:10px;display:none}
+@media(min-width:750px){header{padding-left:calc((100% - 1068px)/2);padding-right:calc((100% - 1068px)/2)}nav{justify-content:center}main{padding-top:22px}}
+/* Refined visual style shared with the working app. */
+:root{--green:#153c32;--green2:#245d4d;--bg:#f4f7f5;--line:#dfe8e2;--shadow:0 8px 24px rgba(25,58,43,.06)}
+body{background:linear-gradient(180deg,#edf4ef 0,#f6f8f6 260px,var(--bg) 100%);-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(115deg,#153c32,#245d4d);box-shadow:0 4px 18px rgba(12,39,30,.16)}
+.brand{max-width:1100px;margin:auto;min-height:48px}.brand-logo{border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.12)}header h1{letter-spacing:-.025em;font-weight:760}
+nav{box-shadow:0 3px 10px rgba(20,50,35,.035);scrollbar-width:thin}nav button{border:1px solid transparent;background:#f1f5f2;color:#355348;border-radius:999px;transition:background .16s,transform .16s}nav button:hover{background:#e4eee7;transform:translateY(-1px)}nav button.active{box-shadow:0 3px 9px #153c3230}
+main{padding-top:20px}.panel{animation:appear .2s ease}@keyframes appear{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+.cards{grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.card,.box{border-color:rgba(216,229,220,.92);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.card{position:relative;overflow:hidden}.card:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#75a58b}
+.kicker{letter-spacing:.015em}.metric{font-size:clamp(22px,3vw,27px);letter-spacing:-.035em;color:var(--green)}h2{font-size:22px;letter-spacing:-.03em}h3{letter-spacing:-.01em;color:#263d32}
+.grid2{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}input,select,textarea{border-radius:10px;padding:10px 12px;min-height:44px;transition:border-color .15s,box-shadow .15s}input:focus,select:focus,textarea:focus{outline:0;border-color:#438267;box-shadow:0 0 0 3px #43826720}
+.btn{border-radius:10px;transition:transform .15s,box-shadow .15s,background .15s}.btn:hover{background:#20513f;transform:translateY(-1px);box-shadow:0 4px 10px #153c3225}.btn:active{transform:translateY(0)}.btn.secondary:hover{background:#dce9df}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.045em}tbody tr:hover{background:#fbfdfb}.tablewrap{border-radius:12px;box-shadow:0 3px 12px rgba(25,58,43,.035)}.productthumb,.fallbackthumb{border-radius:9px}.warning{border-radius:12px;padding:12px 14px}.pill{padding:4px 9px}
+@media(min-width:750px){main{padding-top:25px}.panel>h2{margin-bottom:18px}.cards{gap:14px}}
+@media(max-width:520px){header{padding-top:calc(11px + env(safe-area-inset-top));padding-bottom:11px}.brand{gap:9px}.brand-logo{width:40px;height:40px}header p{font-size:10px}.brand h1{max-width:55vw}#installApp{font-size:12px;padding:9px 10px}nav{top:66px;padding-top:8px;padding-bottom:8px}nav button{padding:8px 11px;font-size:13px}main{padding:16px 12px 38px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card,.box{padding:13px;border-radius:13px}.metric{font-size:21px}.grid2{gap:10px}h2{font-size:20px}th,td{padding:9px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header><div class="brand"><img class="brand-logo" src="smart-stock-logo.png" alt="Kareth logo"><div><h1>Smart Stock & Price Assistant</h1><p>Hardware + Convenience Store · Offline-first · ₱ Philippine peso</p></div><button id="installApp" class="btn" type="button" style="display:none">Install app</button></div></header>
+<nav id="nav">
+<button class="active" data-tab="dashboard"><span class="navicon">▦</span> Dashboard</button><button data-tab="products"><span class="navicon">▤</span> Products</button><button data-tab="sales"><span class="navicon">🛒</span> Sales</button><button data-tab="pricing"><span class="navicon">₱</span> Pricing</button><button data-tab="reports"><span class="navicon">▥</span> Reports</button><button data-tab="customers"><span class="navicon">♙</span> Customers / Credit</button><button data-tab="backup"><span class="navicon">⚙</span> Setup</button>
+</nav>
+<main>
+<section id="dashboard" class="panel active">
+<h2>Store dashboard</h2>
+<div class="cards">
+<div class="card"><div class="kicker">Products listed</div><div class="metric" id="mProducts">0</div></div>
+<div class="card"><div class="kicker">Units in stock</div><div class="metric" id="mUnits">0</div></div><div class="card"><div class="kicker">Units deducted today</div><div class="metric" id="mDeductedToday">0</div></div>
+<div class="card"><div class="kicker">Sales today</div><div class="metric" id="mSales">₱0.00</div></div>
+<div class="card"><div class="kicker">Cash sales today</div><div class="metric" id="mCash">₱0.00</div></div><div class="card"><div class="kicker">Credit sales today</div><div class="metric" id="mCredit">₱0.00</div></div><div class="card"><div class="kicker">Other paid sales</div><div class="metric" id="mOther">₱0.00</div></div>
+<div class="card"><div class="kicker">Estimated gross profit today</div><div class="metric" id="mProfit">₱0.00</div></div>
+</div>
+<div class="grid2">
+<div class="box"><h3>Low-stock alerts</h3><div id="lowStock"></div></div>
+<div class="box"><h3>Recent sales</h3><div id="recentSales"></div></div><div class="box"><h3>Inventory deductions today</h3><div id="stockDeductions"></div></div>
+<div class="box"><h3>Product stock availability</h3><div class="tablewrap" style="max-height:360px"><table><thead><tr><th>Product</th><th>Available stock</th><th>Status</th></tr></thead><tbody id="dashboardProductRows"></tbody></table></div></div>
+</div>
+<div class="warning" style="margin-top:12px">Data is saved in this browser on this device. Export a backup regularly. Clearing browser data or uninstalling the browser can erase records.</div>
+</section>
+
+<section id="products" class="panel">
+<h2>Product records</h2>
+<div class="box">
+<h3 id="productFormTitle">Add a product</h3>
+<input type="hidden" id="editId">
+<div class="grid2">
+<div><label>Product name *</label><input id="pName" placeholder="e.g. 1/2-inch PVC elbow"></div>
+<div><label>Barcode / SKU</label><input id="pBarcode" placeholder="Scan or enter code"></div>
+<div><label>Category</label><select id="pCategory"><option>Hardware</option><option>Convenience</option><option>Electrical</option><option>Plumbing</option><option>Tools</option><option>Building materials</option><option>Food & drinks</option><option>Household</option><option>Other</option></select></div>
+<div><label>Unit of measure</label><select id="pUnit"><option>piece</option><option>bag</option><option>bags</option><option>dozen</option><option>length</option><option>sheet</option><option>box</option><option>roll</option><option>bottle</option><option>can</option><option>kg</option><option>meter</option><option>liter</option><option>pack</option><option>set</option><option>pair</option><option>other</option></select></div><div><label>Product image · upload or capture 📸</label><input id="pImage" type="file" accept="image/*" capture="environment"><span class="note">On supported phones, choose the camera to take a product photo. Use small images (under 1.2 MB).</span><div id="imagePreview" style="margin-top:7px"></div></div>
+<div><label>Cost per unit (₱) *</label><input id="pCost" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div><label>Selling price per unit (₱) *</label><input id="pPrice" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div><label>Current stock quantity *</label><input id="pStock" type="number" min="0" step="1" value="0"></div>
+<div><label>Low-stock alert at quantity</label><input id="pMin" type="number" min="0" step="1" value="5"></div>
+<div><label>Supplier (optional)</label><input id="pSupplier" placeholder="Supplier name"></div>
+</div>
+<button class="btn" onclick="saveProduct()">Save product</button><button class="btn secondary" onclick="clearProductForm()">Clear form</button>
+<p class="note">Selling price can be calculated in the Price Calculator, then copied into this form.</p>
+</div>
+<div class="row" style="margin-top:14px"><div><label>Search product / barcode</label><input id="productSearch" placeholder="Search..." oninput="renderProducts()"></div><div><label>Filter category</label><select id="categoryFilter" onchange="renderProducts()"><option value="">All categories</option><option>Hardware</option><option>Convenience</option><option>Electrical</option><option>Plumbing</option><option>Tools</option><option>Building materials</option><option>Food & drinks</option><option>Household</option><option>Other</option></select></div></div>
+<div class="tablewrap"><table><thead><tr><th>Product</th><th>Barcode/SKU</th><th>Cost</th><th>Price</th><th>Stock</th><th>Gross profit/unit</th><th>Actions</th></tr></thead><tbody id="productRows"></tbody></table></div>
+</section>
+
+<section id="sales" class="panel">
+<h2>Record a sale</h2>
+<div class="grid2">
+<div class="box">
+<h3>Scan or select product</h3>
+<label>Barcode / SKU</label><div class="row"><input id="saleBarcode" placeholder="Scan or type code"><button class="btn" onclick="findBarcode()">Find</button></div>
+<button class="btn secondary" onclick="startScanner()">Use camera scanner</button><button class="btn secondary" onclick="stopScanner()">Stop camera</button>
+<video id="scannerVideo" playsinline></video><p id="scannerStatus" class="note">Camera scanning depends on browser support and secure context. You can always type the barcode manually.</p>
+<label>Product</label><select id="saleProduct" onchange="updateSalePreview()"></select>
+<div class="row"><div><label>Quantity</label><input id="saleQty" type="number" min="1" step="1" value="1" oninput="updateSalePreview()"></div><div><label>Unit selling price (₱)</label><input id="saleUnitPrice" type="number" min="0" step="0.01" oninput="updateSalePreview()"></div></div>
+<label>Payment method</label><select id="salePayment" onchange="toggleCreditFields()"><option>Cash</option><option>GCash</option><option>Card</option><option>Credit line</option><option>Other</option></select><div id="creditSaleFields" style="display:none"><label>Customer credit account *</label><div class="row"><select id="saleCustomer"></select><button class="btn secondary" type="button" onclick="quickAddCustomer()">+ New customer</button></div><div id="quickCustomerForm" class="box" style="display:none;margin-top:8px"><label>Customer name *</label><input id="quickCustomerName" placeholder="Customer or company name"><label>Contact number</label><input id="quickCustomerPhone" placeholder="09xx xxx xxxx"><div class="row"><button class="btn" type="button" onclick="createQuickCustomer()">Save customer</button><button class="btn secondary" type="button" onclick="cancelQuickCustomer()">Cancel</button></div></div><label>Due date *</label><input id="creditDueDate" type="date"><div id="creditStatus" class="note">Select a customer to view the existing balance.</div></div>
+<label>Customer / note (optional)</label><input id="saleNote" placeholder="Reference or receipt note">
+<div id="salePreview" class="note" style="margin-top:10px">Choose a product to preview sale.</div>
+<button class="btn" onclick="recordSale()">Record sale & deduct stock</button>
+</div>
+<div class="box"><h3>Today's sales</h3><div id="salesSummary"></div><p class="note">Recording a sale saves the selling price and cost at the time of sale. Gross profit excludes overhead, tax, and payment fees.</p></div>
+</div>
+<h3 style="margin-top:18px">Sales history</h3>
+<div class="row"><div><label>Filter date</label><input id="salesDateFilter" type="date" onchange="renderSales()"></div><div><label>Search sales</label><input id="salesSearch" placeholder="Product or note" oninput="renderSales()"></div></div>
+<div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Product</th><th>Qty</th><th>Total</th><th>Gross profit</th><th>Payment</th><th>Action</th></tr></thead><tbody id="salesRows"></tbody></table></div>
+</section>
+
+<section id="pricing" class="panel">
+<h2>Price calculator</h2>
+<div class="grid2">
+<div class="box">
+<h3>Calculate selling price</h3>
+<label>Cost per unit (₱)</label><input id="calcCost" type="number" min="0" step="0.01" value="100" oninput="calculatePrice()">
+<label>Pricing method</label><select id="calcMethod" onchange="calculatePrice()"><option value="markup">Cost plus markup</option><option value="margin">Target gross profit margin</option></select>
+<label id="rateLabel">Markup (%)</label><input id="calcRate" type="number" min="0" step="0.1" value="25" oninput="calculatePrice()">
+<div class="cards" style="margin-top:12px">
+<div class="card"><div class="kicker">Suggested selling price</div><div class="metric" id="calcPrice">₱125.00</div></div>
+<div class="card"><div class="kicker">Gross profit / unit</div><div class="metric" id="calcProfit">₱25.00</div></div>
+<div class="card"><div class="kicker">Gross margin</div><div class="metric" id="calcMargin">20.0%</div></div>
+</div>
+<button class="btn secondary" onclick="copyCalcPrice()">Copy price to product form</button>
+<p class="note">Markup % = profit ÷ cost. Margin % = profit ÷ selling price. They are different calculations.</p>
+</div>
+<div class="box">
+<h3>Quick comparison</h3>
+<div class="tablewrap"><table><thead><tr><th>Cost</th><th>Markup</th><th>Selling price</th><th>Profit</th><th>Margin</th></tr></thead><tbody id="priceCompare"></tbody></table></div>
+<p class="note">Suggested prices are before applicable taxes, delivery, spoilage, rent, salaries, and other overhead costs. Check local competitor prices before setting a final price.</p>
+</div>
+</div>
+</section>
+
+<section id="reports" class="panel">
+<h2>Reports</h2>
+<div class="box">
+<div class="row"><div><label>Start date</label><input type="date" id="reportStart"></div><div><label>End date</label><input type="date" id="reportEnd"></div><div><button class="btn" onclick="renderReports()">Generate report</button></div></div>
+<div class="cards" style="margin-top:14px">
+<div class="card"><div class="kicker">Sales revenue</div><div class="metric" id="rRevenue">₱0.00</div></div>
+<div class="card"><div class="kicker">Estimated gross profit</div><div class="metric" id="rProfit">₱0.00</div></div>
+<div class="card"><div class="kicker">Units sold</div><div class="metric" id="rUnits">0</div></div>
+<div class="card"><div class="kicker">Transactions</div><div class="metric" id="rCount">0</div></div>
+</div>
+<button class="btn" onclick="exportSalesCSV()">Export sales CSV</button><button class="btn secondary" onclick="exportProductsCSV()">Export product CSV</button>
+<div class="tablewrap"><table><thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th><th>Gross profit</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+</div>
+</section>
+
+<section id="customers" class="panel"><h2>Customers & credit accounts</h2><div class="grid2"><div class="box"><h3>Add / edit customer</h3><input type="hidden" id="customerEditId"><label>Customer name *</label><input id="cName" placeholder="Customer or company name"><label>Contact number</label><input id="cPhone" placeholder="09xx xxx xxxx"><label>Opening balance already owed (₱)</label><input id="cOpening" type="number" min="0" step="0.01" value="0"><label>Opening balance due date</label><input id="cOpeningDueDate" type="date"><button class="btn" onclick="saveCustomer()">Save customer</button><button class="btn secondary" onclick="clearCustomerForm()">Clear</button><p class="note">Existing balances are included in each customer account summary.</p></div><div class="box"><h3>Credit account summary</h3><div id="creditTotals"></div><p class="note">Basic local customer ledger.</p></div></div><div class="tablewrap"><table><thead><tr><th>Customer</th><th>Contact</th><th>Balance owed</th><th>Next due date</th><th>Actions</th></tr></thead><tbody id="customerRows"></tbody></table></div><div class="box" style="margin-top:14px"><h3>Record customer payment</h3><div class="grid2"><div><label>Customer</label><select id="paymentCustomer"></select></div><div><label>Amount received (₱)</label><input id="paymentAmount" type="number" min="0.01" step="0.01" placeholder="0.00"></div></div><label>Payment method</label><select id="paymentMethod"><option>Cash</option><option>GCash</option><option>Bank transfer</option><option>Card</option><option>Other</option></select><label>Payment note</label><input id="paymentNote" placeholder="Receipt/reference number"><button class="btn" onclick="recordCustomerPayment()">Record payment</button><h3 style="margin-top:16px">Credit ledger</h3><div class="tablewrap"><table><thead><tr><th>Date/time</th><th>Customer</th><th>Entry</th><th>Amount</th><th>Due date</th><th>Reference / payment method</th></tr></thead><tbody id="creditLedgerRows"></tbody></table></div></div></section>
+<section id="backup" class="panel">
+<h2>Backup, restore & setup</h2>
+<div class="grid2">
+<div class="box"><h3>Backup all data</h3><p>Save products and sales as a JSON backup file. Keep it somewhere safe and repeat this regularly.</p><button class="btn" onclick="backupData()">Download full backup</button></div>
+<div class="box"><h3>Restore a backup</h3><p>Restoring replaces the current products and sales data on this device.</p><input id="restoreFile" type="file" accept=".json,application/json"><button class="btn" onclick="restoreData()">Restore backup</button></div>
+<div class="box"><h3>Store details</h3><label>Store name</label><input id="storeName" placeholder="My Store"><button class="btn" onclick="saveSettings()">Save store name</button><p class="note">This name is used in the app heading and exports.</p></div>
+<div class="box"><h3>Sample data / clear data</h3><p>Load a few example products to test the app. This adds examples to your current inventory.</p><button class="btn secondary" onclick="loadSamples()">Add sample products</button><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><button class="btn danger" onclick="clearAllData()">Delete all app data</button></div>
+</div>
+<div class="warning" style="margin-top:12px"><b>Offline and device limitation:</b> this prototype saves data in the browser on the device. It does not automatically sync between phone and computer. Back up and restore manually to move data between devices. For dependable camera scanning, open it from a secure website (HTTPS) or localhost; manual barcode entry remains available.</div>
+<h3 style="margin-top:18px">How to install</h3>
+<ol>
+<li>Download and unzip the app package on your Windows computer.</li>
+<li>Open <b>index.html</b> in Chrome or Edge to test it.</li>
+<li>On Android, copy the file to your phone and open it in a browser if supported. For best installation and camera support, host the folder on an HTTPS static host or local web server, then open the URL in Chrome.</li>
+<li>In Chrome on Android, use the browser menu and choose <b>Add to Home screen</b> or <b>Install app</b> when offered.</li>
+<li>Use Backup & setup to export a backup before changing browser, clearing storage, or moving devices.</li>
+</ol>
+<p class="note">This first version is a local web app prototype, not a Play Store APK. Do not use it as your only accounting record until you have tested backups, prices, and sales on sample data.</p>
+</section>
+<footer>Smart Stock & Price Assistant · Local prototype · No account required</footer>
+</main>
+<script>
+const KEY='smartStockAssistant.v1';
+let state={products:[],sales:[],customers:[],ledger:[],settings:{storeName:'Smart Stock & Price Assistant'}};
+const $=id=>document.getElementById(id);
+const money=n=>'₱'+(Number(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=id=>Number($(id).value)||0;
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.products)&&Array.isArray(s.sales))state=s;}catch(e){};state.customers=state.customers||[];state.ledger=state.ledger||[]; $('storeName').value=state.settings.storeName||''; $('reportStart').value=today();$('reportEnd').value=today();$('salesDateFilter').value=today();renderAll();}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll();}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function productById(id){return state.products.find(p=>p.id===id)}
+function setTab(tab){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===tab));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));if(tab==='reports')renderReports();if(tab==='sales'){renderSaleOptions();renderSales();}}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+let pendingProductImage='';$('pImage').addEventListener('change',()=>{const f=$('pImage').files[0];if(!f){pendingProductImage='';$('imagePreview').innerHTML='';return}if(f.size>1200000){alert('Choose an image smaller than 1.2 MB.');$('pImage').value='';return}const r=new FileReader();r.onload=()=>{pendingProductImage=String(r.result||'');$('imagePreview').innerHTML='<img class="productthumb" style="width:90px;height:90px" src="'+pendingProductImage+'" alt="Product preview">'};r.readAsDataURL(f)});
+function saveProduct(){
+ const id=$('editId').value,name=$('pName').value.trim(),barcode=$('pBarcode').value.trim(),cost=num('pCost'),price=num('pPrice'),stock=num('pStock'),min=num('pMin');
+ if(!name){alert('Enter a product name.');return} if($('pCost').value===''||$('pPrice').value===''||$('pStock').value===''){alert('Enter cost, selling price, and stock quantity.');return}
+ if(cost<0||price<0||stock<0||min<0){alert('Values cannot be negative.');return}
+ if(barcode&&state.products.some(p=>p.barcode===barcode&&p.id!==id)){alert('That barcode/SKU is already assigned to another product.');return}
+ const oldProduct=id?productById(id):null;const p={id:id||uid(),name,barcode,category:$('pCategory').value,unit:$('pUnit').value||'piece',cost,price,stock,min,supplier:$('pSupplier').value.trim(),image:pendingProductImage||(oldProduct&&oldProduct.image)||''};
+ if(id){const i=state.products.findIndex(x=>x.id===id);if(i>=0)state.products[i]=p}else state.products.push(p);
+ clearProductForm();save();alert('Product saved.');
+}
+function clearProductForm(){['editId','pName','pBarcode','pSupplier'].forEach(id=>$(id).value='');$('pCategory').value='Hardware';$('pUnit').value='piece';$('pCost').value='';$('pPrice').value='';$('pStock').value=0;$('pMin').value=5;$('pImage').value='';$('imagePreview').innerHTML='';pendingProductImage='';$('productFormTitle').textContent='Add a product';}
+function editProduct(id){const p=productById(id);if(!p)return; $('editId').value=p.id;$('pName').value=p.name;$('pBarcode').value=p.barcode||'';$('pCategory').value=p.category;$('pUnit').value=p.unit;$('pCost').value=p.cost;$('pPrice').value=p.price;$('pStock').value=p.stock;$('pMin').value=p.min;$('pSupplier').value=p.supplier||'';pendingProductImage='';$('pImage').value='';$('imagePreview').innerHTML=p.image?'<img class="productthumb" style="width:90px;height:90px" src="'+p.image+'" alt="Product preview">':'';$('productFormTitle').textContent='Edit product';setTab('products');window.scrollTo({top:0,behavior:'smooth'});}
+function deleteProduct(id){if(!confirm('Delete this product? Past sales remain in sales history.'))return;state.products=state.products.filter(p=>p.id!==id);save();}
+function renderProducts(){
+ const q=$('productSearch').value.toLowerCase(),cat=$('categoryFilter').value;
+ const arr=state.products.filter(p=>(!cat||p.category===cat)&&[p.name,p.barcode,p.category,p.supplier].join(' ').toLowerCase().includes(q));
+ $('productRows').innerHTML=arr.length?arr.map(p=>`<tr><td><div class="productnamecell">${p.image?`<img class="productthumb" src="${p.image}" alt="${esc(p.name)}">`:'<div class="fallbackthumb">▤</div>'}<div><b>${esc(p.name)}</b><br><span class="note">${esc(p.category)} · ${esc(p.unit)}</span><br><span class="note">Stock: <b>${p.stock} ${esc(p.unit)}</b></span></div></div></td><td>${esc(p.barcode||'—')}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td>${p.stock<=p.min?'<span class="bad">':''}${p.stock} ${esc(p.unit)}${p.stock<=p.min?'</span>':''}</td><td>${money(p.price-p.cost)}</td><td><button class="btn secondary small" onclick="editProduct('${p.id}')">Edit</button><button class="btn danger small" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No products found.</td></tr>';
+}
+function renderSaleOptions(selected){$('saleProduct').innerHTML='<option value="">Choose product…</option>'+state.products.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.id}" ${selected===p.id?'selected':''}>${esc(p.name)} · stock ${p.stock} · ${money(p.price)}</option>`).join('');updateSalePreview();}
+function updateSalePreview(){const p=productById($('saleProduct').value);if(!p){$('salePreview').textContent='Choose a product to preview sale.';return}if(!$('saleUnitPrice').dataset.edited)$('saleUnitPrice').value=p.price;const qty=Math.max(0,num('saleQty')),price=Math.max(0,num('saleUnitPrice'));$('salePreview').innerHTML=`Available stock: <b>${p.stock} ${esc(p.unit)}</b><br>Sale total: <b>${money(qty*price)}</b> · Estimated gross profit: <b>${money(qty*(price-p.cost))}</b>${qty>p.stock?'<br><span class="bad">Quantity exceeds available stock.</span>':''}`;}
+$('saleUnitPrice').addEventListener('input',()=>{$('saleUnitPrice').dataset.edited='1';updateSalePreview();});
+$('saleProduct').addEventListener('change',()=>{$('saleUnitPrice').dataset.edited='';updateSalePreview();});$('saleCustomer').addEventListener('change',updateCreditStatus);
+function findBarcode(){const code=$('saleBarcode').value.trim();const p=state.products.find(p=>p.barcode===code||p.id===code);if(!p){alert('No product found for that barcode/SKU. Add the product first or check the code.');return}renderSaleOptions(p.id);$('saleQty').focus();}
+function recordSale(){const p=productById($('saleProduct').value),qty=Math.floor(num('saleQty')),price=num('saleUnitPrice'),payment=$('salePayment').value;ensureCreditData();if(!p){alert('Choose a product.');return}if(qty<1){alert('Quantity must be at least 1.');return}if(qty>p.stock){alert('Not enough stock. Available: '+p.stock);return}if(price<0){alert('Price cannot be negative.');return}let customer=null;if(payment==='Credit line'){customer=customerById($('saleCustomer').value);if(!customer){alert('Select a customer credit account or create a new customer.');return}if(!$('creditDueDate').value){alert('Choose a due date for this credit sale.');return}}const sale={id:uid(),date:new Date().toISOString(),productId:p.id,productName:p.name,barcode:p.barcode,qty,unit:p.unit,unitPrice:price,unitCost:p.cost,total:qty*price,profit:qty*(price-p.cost),payment,customerId:customer?customer.id:'',customerName:customer?customer.name:'',note:$('saleNote').value.trim()};p.stock-=qty;state.sales.push(sale);if(customer)state.ledger.push({id:uid(),customerId:customer.id,customerName:customer.name,type:'charge',amount:sale.total,date:sale.date,dueDate:$('creditDueDate').value,reference:'Sale '+sale.id+' · '+p.name+' × '+qty});$('saleQty').value=1;$('saleNote').value='';$('saleUnitPrice').dataset.edited='';$('saleBarcode').value='';if(customer)$('creditDueDate').value='';save();renderSaleOptions(p.id);alert(customer?'Credit sale recorded for '+customer.name+'. Stock updated and balance added.':'Sale recorded and stock updated.');}
+function renderSales(){const date=$('salesDateFilter').value,q=$('salesSearch').value.toLowerCase();const arr=state.sales.filter(s=>(!date||s.date.slice(0,10)===date)&&[s.productName,s.note,s.payment].join(' ').toLowerCase().includes(q)).slice().reverse();$('salesRows').innerHTML=arr.length?arr.map(s=>`<tr><td>${new Date(s.date).toLocaleString()}</td><td>${esc(s.productName)}<br><span class="note">${esc(s.note||'')}</span></td><td>${s.qty}</td><td>${money(s.total)}</td><td>${money(s.profit)}</td><td>${esc(s.payment)}</td><td><button class="btn danger small" onclick="voidSale('${s.id}')">Void</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No sales for this filter.</td></tr>';const ds=state.sales.filter(s=>s.date.slice(0,10)===today());$('salesSummary').innerHTML=`Transactions: <b>${ds.length}</b><br>Revenue: <b>${money(ds.reduce((a,s)=>a+s.total,0))}</b><br>Estimated gross profit: <b>${money(ds.reduce((a,s)=>a+s.profit,0))}</b>`;}
+function voidSale(id){const s=state.sales.find(x=>x.id===id);if(!s||!confirm('Void this sale and return the quantity to stock?'))return;const p=productById(s.productId);if(p)p.stock+=s.qty;state.sales=state.sales.filter(x=>x.id!==id);save();renderSales();}
+function renderDashboard(){const t=state.sales.filter(s=>s.date.slice(0,10)===today()),cash=t.filter(s=>s.payment==='Cash'),credit=t.filter(s=>s.payment==='Credit line'),other=t.filter(s=>s.payment!=='Cash'&&s.payment!=='Credit line');$('mProducts').textContent=state.products.length;$('mUnits').textContent=state.products.reduce((a,p)=>a+p.stock,0);$('mSales').textContent=money(t.reduce((a,s)=>a+s.total,0));$('mCash').textContent=money(cash.reduce((a,s)=>a+s.total,0));$('mCredit').textContent=money(credit.reduce((a,s)=>a+s.total,0));$('mOther').textContent=money(other.reduce((a,s)=>a+s.total,0));$('mProfit').textContent=money(t.reduce((a,s)=>a+s.profit,0));const low=state.products.filter(p=>p.stock<=p.min);$('lowStock').innerHTML=low.length?'<ul>'+low.map(p=>'<li>'+esc(p.name)+': <b class="bad">'+p.stock+' '+esc(p.unit)+'</b> (alert at '+p.min+')</li>').join('')+'</ul>':'<p class="good">No low-stock products.</p>';const recent=state.sales.slice(-5).reverse();$('recentSales').innerHTML=recent.length?recent.map(s=>'<div>'+esc(s.productName)+' · '+s.qty+' × '+money(s.unitPrice)+'<br><b>'+money(s.total)+'</b> <span class="note">'+new Date(s.date).toLocaleString()+'</span></div>').join(''):'<p class="empty">No sales recorded yet.</p>';const deductions=t.slice().reverse();$('mDeductedToday').textContent=t.reduce((a,s)=>a+s.qty,0);$('stockDeductions').innerHTML=deductions.length?deductions.map(s=>'<div><b>'+esc(s.productName)+'</b> · −'+s.qty+' '+esc(s.unit||'unit')+'<br><span class="note">'+new Date(s.date).toLocaleString()+' · '+esc(s.payment)+'</span></div>').join(''):'<p class="empty">No stock deducted today.</p>';$('dashboardProductRows').innerHTML=state.products.length?state.products.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<tr><td>'+esc(p.name)+'</td><td><b>'+p.stock+'</b> '+esc(p.unit||'unit')+'</td><td>'+(p.stock<=p.min?'<span class="pill" style="background:#fff0ef;color:#b42318">Low stock</span>':'<span class="pill">Available</span>')+'</td></tr>').join(''):'<tr><td colspan="3" class="empty">No products listed yet.</td></tr>';}
+function calculatePrice(){const cost=Math.max(0,num('calcCost')),rate=Math.max(0,num('calcRate')),method=$('calcMethod').value;$('rateLabel').textContent=method==='markup'?'Markup (%)':'Target gross profit margin (%)';let price=0;if(method==='markup')price=cost*(1+rate/100);else price=rate>=100?Infinity:cost/(1-rate/100);const profit=price-cost,margin=price>0?profit/price*100:0;$('calcPrice').textContent=Number.isFinite(price)?money(price):'Invalid';$('calcProfit').textContent=Number.isFinite(profit)?money(profit):'—';$('calcMargin').textContent=Number.isFinite(margin)?margin.toFixed(1)+'%':'—';const rates=[10,20,30,40,50];$('priceCompare').innerHTML=rates.map(r=>{const pr=cost*(1+r/100);return `<tr><td>${money(cost)}</td><td>${r}%</td><td>${money(pr)}</td><td>${money(pr-cost)}</td><td>${((pr-cost)/pr*100).toFixed(1)}%</td></tr>`}).join('');}
+function copyCalcPrice(){const v=$('calcPrice').textContent.replace(/[₱,]/g,'');if(!Number.isFinite(Number(v))||v==='')return alert('Calculate a valid price first.');$('pCost').value=num('calcCost');$('pPrice').value=Number(v).toFixed(2);setTab('products');$('pName').focus();}
+function inRange(s,start,end){const d=s.date.slice(0,10);return (!start||d>=start)&&(!end||d<=end)}
+function renderReports(){const start=$('reportStart').value,end=$('reportEnd').value;const arr=state.sales.filter(s=>inRange(s,start,end));$('rRevenue').textContent=money(arr.reduce((a,s)=>a+s.total,0));$('rProfit').textContent=money(arr.reduce((a,s)=>a+s.profit,0));$('rUnits').textContent=arr.reduce((a,s)=>a+s.qty,0);$('rCount').textContent=arr.length;const map={};arr.forEach(s=>{const k=s.productName;map[k]??={qty:0,total:0,profit:0};map[k].qty+=s.qty;map[k].total+=s.total;map[k].profit+=s.profit});const rows=Object.entries(map).sort((a,b)=>b[1].total-a[1].total);$('reportRows').innerHTML=rows.length?rows.map(([n,v])=>`<tr><td>${esc(n)}</td><td>${v.qty}</td><td>${money(v.total)}</td><td>${money(v.profit)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No sales in selected period.</td></tr>';}
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportProductsCSV(){const cols=['name','barcode','category','unit','cost','price','stock','min','supplier'];download('products-'+today()+'.csv',[cols.join(','),...state.products.map(p=>cols.map(k=>csvCell(p[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
+function exportSalesCSV(){const cols=['date','productName','barcode','qty','unitPrice','unitCost','total','profit','payment','note'];const start=$('reportStart').value,end=$('reportEnd').value,arr=state.sales.filter(s=>inRange(s,start,end));download('sales-'+(start||'all')+'-to-'+(end||'all')+'.csv',[cols.join(','),...arr.map(s=>cols.map(k=>csvCell(s[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
+function backupData(){download('smart-stock-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json');}
+function restoreData(){const f=$('restoreFile').files[0];if(!f)return alert('Choose a JSON backup file.');const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.products)||!Array.isArray(d.sales))throw Error('Invalid backup');if(!confirm('This will replace current data. Continue?'))return;state=d;state.customers=state.customers||[];state.ledger=state.ledger||[];save();$('storeName').value=state.settings?.storeName||'';alert('Backup restored.')}catch(e){alert('Could not restore: invalid backup file.')}};r.readAsText(f);}
+function saveSettings(){state.settings.storeName=$('storeName').value.trim()||'Smart Stock & Price Assistant';save();document.querySelector('header h1').textContent=state.settings.storeName;alert('Store name saved.')}
+function loadSamples(){const samples=[['Portland cement 40kg','SAMPLE-CEM-40','Building materials','bag',245,285,20,5],['PVC elbow 1/2 inch','SAMPLE-PVC-12','Plumbing','piece',8,12,40,10],['LED bulb 9W','SAMPLE-LED-9W','Electrical','piece',55,79,15,5],['Bottled water 500mL','SAMPLE-WATER-500','Convenience','bottle',8,12,30,10],['Utility knife','SAMPLE-KNIFE','Tools','piece',35,55,8,3]];let added=0;samples.forEach(a=>{if(!state.products.some(p=>p.barcode===a[1])){state.products.push({id:uid(),name:a[0],barcode:a[1],category:a[2],unit:a[3],cost:a[4],price:a[5],stock:a[6],min:a[7],supplier:'Sample supplier'});added++}});save();alert(added+' sample products added.');}
+function clearAllData(){if(!confirm('Delete ALL products, sales, and settings from this browser? Export a backup first.'))return;if(!confirm('Final confirmation: permanently clear this app data?'))return;state={products:[],sales:[],settings:{storeName:'Smart Stock & Price Assistant'}};localStorage.removeItem(KEY);save();clearProductForm();alert('App data cleared.')}
+let stream=null,scanActive=false;
+async function startScanner(){if(!('BarcodeDetector'in window)){alert('This browser does not support built-in barcode scanning. Use a compatible browser or type the barcode manually.');return}try{const detector=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','qr_code']});stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});const video=$('scannerVideo');video.srcObject=stream;video.style.display='block';await video.play();scanActive=true;$('scannerStatus').textContent='Point the camera at a product barcode.';const scan=async()=>{if(!scanActive)return;try{const codes=await detector.detect(video);if(codes.length){$('saleBarcode').value=codes[0].rawValue;findBarcode();stopScanner();return}}catch(e){}requestAnimationFrame(scan)};scan()}catch(e){alert('Camera unavailable. Use HTTPS/localhost, allow camera permission, or enter the barcode manually.');stopScanner()}}
+function stopScanner(){scanActive=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$('scannerVideo').style.display='none';$('scannerVideo').srcObject=null;}
+function customerById(id){return (state.customers||[]).find(c=>c.id===id)}
+function customerBalance(id){return (state.ledger||[]).filter(e=>e.customerId===id).reduce((sum,e)=>sum+(e.type==='charge'?e.amount:-e.amount),0)}
+function customerDueDate(id){let charges=state.ledger.filter(e=>e.customerId===id&&e.type==='charge').map(e=>({amount:Number(e.amount)||0,dueDate:e.dueDate||''}));let payments=state.ledger.filter(e=>e.customerId===id&&e.type==='payment').reduce((a,e)=>a+(Number(e.amount)||0),0);charges.sort((a,b)=>(a.dueDate||'9999-12-31').localeCompare(b.dueDate||'9999-12-31'));for(const c of charges){const used=Math.min(c.amount,payments);c.amount-=used;payments-=used}const next=charges.find(c=>c.amount>0.005);return next?(next.dueDate||'No due date'):'—'}
+function ensureCreditData(){state.customers=state.customers||[];state.ledger=state.ledger||[]}
+function renderCustomerOptions(selected){ensureCreditData();const opts='<option value="">Choose customer…</option>'+state.customers.map(c=>`<option value="${c.id}" ${selected===c.id?'selected':''}>${esc(c.name)} · owes ${money(customerBalance(c.id))}</option>`).join('');$('saleCustomer').innerHTML=opts;$('paymentCustomer').innerHTML=opts;updateCreditStatus()}
+function toggleCreditFields(){const on=$('salePayment').value==='Credit line';$('creditSaleFields').style.display=on?'block':'none';if(on)renderCustomerOptions($('saleCustomer').value)}
+function updateCreditStatus(){if(!$('creditStatus'))return;const id=$('saleCustomer').value,c=customerById(id);$('creditStatus').textContent=c?'Existing balance: '+money(customerBalance(id))+' · Next due: '+customerDueDate(id):'Select a customer to view the existing balance.'}
+function quickAddCustomer(){$('quickCustomerForm').style.display='block';$('quickCustomerName').focus()}function cancelQuickCustomer(){$('quickCustomerName').value='';$('quickCustomerPhone').value='';$('quickCustomerForm').style.display='none'}function createQuickCustomer(){const name=$('quickCustomerName').value.trim(),phone=$('quickCustomerPhone').value.trim();if(!name){alert('Enter a customer name.');$('quickCustomerName').focus();return}ensureCreditData();const c={id:uid(),name,phone};state.customers.push(c);save();renderCustomerOptions(c.id);$('saleCustomer').value=c.id;cancelQuickCustomer();updateCreditStatus()}
+function saveCustomer(){ensureCreditData();const id=$('customerEditId').value,name=$('cName').value.trim(),phone=$('cPhone').value.trim(),opening=num('cOpening'),dueDate=$('cOpeningDueDate').value;if(!name){alert('Enter customer name.');return}if(opening<0){alert('Opening balance cannot be negative.');return}let c=id?customerById(id):null;if(!c){c={id:uid(),name,phone};state.customers.push(c)}else{c.name=name;c.phone=phone}if(opening>0)state.ledger.push({id:uid(),customerId:c.id,customerName:name,type:'charge',amount:opening,date:new Date().toISOString(),dueDate,reference:'Opening balance'});save();clearCustomerForm();alert('Customer saved.')}
+function clearCustomerForm(){$('customerEditId').value='';$('cName').value='';$('cPhone').value='';$('cOpening').value=0;$('cOpeningDueDate').value=''}
+function editCustomer(id){const c=customerById(id);if(!c)return;$('customerEditId').value=id;$('cName').value=c.name;$('cPhone').value=c.phone||'';$('cOpening').value=0;$('cOpeningDueDate').value='';setTab('customers');window.scrollTo({top:0,behavior:'smooth'})}
+function deleteCustomer(id){if(customerBalance(id)!==0){alert('This account has a balance. Record payment or resolve the balance before deleting.');return}if(!confirm('Delete this customer account?'))return;state.customers=state.customers.filter(c=>c.id!==id);save()}
+function recordCustomerPayment(){ensureCreditData();const id=$('paymentCustomer').value,amount=num('paymentAmount'),c=customerById(id);if(!c){alert('Choose a customer.');return}if(amount<=0){alert('Enter a payment amount greater than zero.');return}if(customerBalance(id)<=0){alert('This customer has no outstanding balance.');return}if(amount>customerBalance(id)&&!confirm('Payment exceeds balance. Record extra as customer credit?'))return;state.ledger.push({id:uid(),customerId:id,customerName:c.name,type:'payment',amount,date:new Date().toISOString(),reference:$('paymentMethod').value+($('paymentNote').value.trim()?' · '+$('paymentNote').value.trim():'')});$('paymentAmount').value='';$('paymentNote').value='';save();alert('Customer payment recorded.')}
+function renderCustomers(){ensureCreditData();renderCustomerOptions($('saleCustomer').value);const rows=state.customers.map(c=>'<tr><td><b>'+esc(c.name)+'</b></td><td>'+esc(c.phone||'—')+'</td><td>'+money(customerBalance(c.id))+'</td><td>'+esc(customerDueDate(c.id))+'</td><td><button class="btn secondary small" onclick="editCustomer(\''+c.id+'\')">Edit</button><button class="btn danger small" onclick="deleteCustomer(\''+c.id+'\')">Delete</button></td></tr>').join('');$('customerRows').innerHTML=rows||'<tr><td colspan="5" class="empty">No customer accounts yet.</td></tr>';$('creditTotals').innerHTML='Customer accounts: <b>'+state.customers.length+'</b><br>Total outstanding balance: <b>'+money(state.customers.reduce((a,c)=>a+customerBalance(c.id),0))+'</b>';const led=state.ledger.slice().reverse();$('creditLedgerRows').innerHTML=led.length?led.map(e=>'<tr><td>'+new Date(e.date).toLocaleString()+'</td><td>'+esc(e.customerName)+'</td><td>'+(e.type==='charge'?'Credit charge':'Payment received')+'</td><td>'+(e.type==='charge'?'+':'−')+money(e.amount)+'</td><td>'+esc(e.dueDate||'—')+'</td><td>'+esc(e.reference||'—')+'</td></tr>').join(''):'<tr><td colspan="6" class="empty">No credit entries yet.</td></tr>'}
+
+function renderAll(){renderProducts();renderSaleOptions();renderSales();renderDashboard();calculatePrice();renderReports();renderCustomers();document.querySelector('header h1').textContent=state.settings.storeName||'Smart Stock & Price Assistant';}
+load();
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;$('installApp').style.display='inline-flex'});
+$('installApp').addEventListener('click',async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installApp').style.display='none'});
+if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+</script>
+</body>
+</html>
