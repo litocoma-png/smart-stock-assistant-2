@@ -1,6 +1,6 @@
 # Smart Stock Assistant for Android
 
-This project packages the store app and its images inside an Android APK. It opens from an Android home-screen icon and works offline; users do not need to launch a browser. Store records remain in that app's private local storage on each device.
+This project packages the store app and the supplied Kareth logo inside an Android APK. It opens from a launcher icon using the Kareth logo and works offline; users do not need to launch a browser. Store records remain in that app's private local storage on each device.
 
 ## Build and download from GitHub
 
